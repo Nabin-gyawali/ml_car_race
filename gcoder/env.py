@@ -364,6 +364,8 @@ class CarWorld:
             "Straight: " + ("CLOSE" if sensor_states[1] == 0 else "FAR"),
             "Right: " + ("CLOSE" if sensor_states[2] == 0 else "FAR"),
         ]
+        action_text = "Action: " + ("LEFT" if self.car.x < (ROAD_LEFT + ROAD_RIGHT) / 2 else "RIGHT" if self.car.x > (ROAD_LEFT + ROAD_RIGHT) / 2 else "STRAIGHT")
+        sensor_texts.append(action_text)
         for i, text in enumerate(sensor_texts):
             text_surface = self.font.render(text, True, (255, 255, 255))
             self.window.blit(text_surface, (10, 10 + i * 40))

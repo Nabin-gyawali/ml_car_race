@@ -1,7 +1,7 @@
-# gcoder — Car Agent trained with SARSA
+# gcoder — Car Race RL: SARSA vs Q-learning
 
 A small reinforcement learning project: a car learns to drive down a road full of
-obstacles using the **SARSA** algorithm. Rendered with `pygame`.
+obstacles using **SARSA** and **Q-learning**. Rendered with `pygame`.
 
 ## Environment
 
@@ -75,43 +75,70 @@ Hyperparameters used (`sarsa.py`):
 ### Q-table after 1000 episodes of SARSA
 
 ```
-[[12.84 10.24  5.89]
- [-1.03 11.23 15.52]
- [14.33 16.29 14.57]
- [15.26 14.94 17.18]
- [15.19 14.81  9.23]
- [ 8.33  8.7  11.59]
- [15.58 15.81 15.84]
- [27.54 19.42 18.84]]
+[[19.45 17.03 21.51]
+ [20.1  21.78 27.54]
+ [23.7  23.87 24.54]
+ [28.88 28.59 30.25]
+ [23.83  5.65  5.26]
+ [16.07 14.51 24.03]
+ [24.48 21.9  20.39]
+ [38.08 27.49 27.87]]
 ```
 
 (columns = LEFT, STRAIGHT, RIGHT)
 
-## Trained agent rendering
+## Algorithm — Q-learning
 
-After training, the greedy policy (no exploration) drives the car to the end of
-the road:
+[Q-learning](https://en.wikipedia.org/wiki/Q-learning) is the off-policy
+counterpart of SARSA. The update rule is:
 
-https://github.com/Govindakandel/ml_car_race/gcoder/sarsa_agent.mp4
+```
+Q(s,a) ← Q(s,a) + α [ r + γ max_a' Q(s',a') − Q(s,a) ]
+```
 
-> Replace the URL above with your actual GitHub repo raw URL once pushed, or
-> embed the video with an HTML tag (renders on GitHub):
->
-> ```html
-> <video src="sarsa_agent.mp4" controls></video>
-> ```
+The key difference: instead of the Q-value of the action actually taken next,
+Q-learning bootstraps from the **best** next action (`max`), assuming the greedy
+policy is followed in the future — regardless of what was actually done
+(hence *off-policy*).
+
+Same hyperparameters (`Qlearning.py`): `alpha=0.1`, `epsilon=0.1`,
+`gamma=0.9`, 1000 episodes.
+
+### Q-table after 1000 episodes of Q-learning
+
+```
+[[19.89 20.96 20.31]
+ [19.69 24.11 26.42]
+ [21.3  19.83 18.11]
+ [25.05 25.58 29.72]
+ [19.39 12.58  6.95]
+ [17.91 19.22 20.9 ]
+ [14.46 19.06 17.43]
+ [40.33 49.55 42.35]]
+```
+
+## Trained agents rendering
+
+After training, both greedy policies (no exploration) drive the car:
+
+**SARSA agent:**
+
+![SARSA agent driving](sarsa_agent.gif)
+
+**Q-learning agent:**
+
+![Q-learning agent driving](qlearning_agent.gif)
 
 ## How to run
 
 ```bash
 pip install pygame-ce numpy gymnasium
-python sarsa.py
+python sarsa.py       # train + watch the SARSA agent
+python Qlearning.py   # train + watch the Q-learning agent
+python record.py     # regenerate videos/gifs
 ```
 
 - `env.py` — the CarWorld environment (random agent demo: `python env.py`)
-- `sarsa.py` — training loop + renders the trained agent
-- `record.py` — records the trained agent to `sarsa_agent.mp4`
-
-## TODO
-
-- [ ] Q-learning (`Qlearning.py`) — coming soon
+- `sarsa.py` — SARSA training loop + renders the trained agent
+- `Qlearning.py` — Q-learning training loop + renders the trained agent
+- `record2.py` — records both agents to `.mp4` / `.gif`

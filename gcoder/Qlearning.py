@@ -2,6 +2,7 @@ from env import CarWorld
 import numpy as np
 
 
+
 def state_id(state):
     return state[0] * 4 + state[1] * 2 + state[2] * 1
 
@@ -12,37 +13,35 @@ def choose_action(qtable, state, epsilon):
         return np.argmax(qtable[state_id(state)])  # Best action
 
 
-def run_sarsa(env , Q_table, alpha=0.1, epsilon=0.1, gamma=0.9, episodes=1000):
+def run_q_learning(env , Q_table, alpha=0.1, epsilon=0.1, gamma=0.9, episodes=1000):
     qtable = Q_table
     Environment = env
     for episode in range(episodes):
         initial_state , info  = Environment.reset()
-        action = choose_action(qtable, initial_state, epsilon)
         done = False
         curr_state = initial_state
         while not done:
+            action = choose_action(qtable, curr_state, epsilon)
             next_state, reward, finished, crashed, info = Environment.step(action)
 
             if finished or crashed:
                 done = True
                 target = reward
             else :
-                next_action = choose_action(qtable, next_state, epsilon)
-                target = reward + gamma * qtable[state_id(next_state), next_action]
+                target = reward + gamma * np.max(qtable[state_id(next_state)])
             
             td_error = target - qtable[state_id(curr_state), action]
 
-            # Update Q-table using SARSA update rule
+            # Update Q-table using Q-learning update rule
             qtable[state_id(curr_state), action] += alpha * td_error
 
             curr_state = next_state
-            action = next_action
 
 
 if __name__ == "__main__":
     env = CarWorld(render_mode="human", random_seed=42)
     qtable = np.zeros((8, 3))  # 8 states and 3 actions
-    run_sarsa(env, qtable, alpha=0.1, epsilon=0.1, gamma=0.9, episodes=1000)
+    run_q_learning(env, qtable, alpha=0.1, epsilon=0.1, gamma=0.9, episodes=1000)
     print("Trained Q-table:")
     print(qtable)
 
@@ -56,5 +55,3 @@ if __name__ == "__main__":
         if finished or crashed:
             done = True
         initial_obs = next_obs
-
-
