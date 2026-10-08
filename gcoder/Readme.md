@@ -1,4 +1,4 @@
-# gcoder — Car Race RL: SARSA vs Q-learning
+# Car Race RL: SARSA vs Q-learning
 
 A small reinforcement learning project: a car learns to drive down a road full of
 obstacles using **SARSA** and **Q-learning**. Rendered with `pygame`.
